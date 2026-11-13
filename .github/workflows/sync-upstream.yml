@@ -3,7 +3,6 @@ name: Sync Upstream
 
 on:
   schedule:
-    # 每天北京时间 11:17 自动同步
     - cron: "17 3 * * *"
   workflow_dispatch:
 
@@ -20,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout fork
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
