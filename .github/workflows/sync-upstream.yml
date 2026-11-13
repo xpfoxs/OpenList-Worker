@@ -3,25 +3,34 @@ name: Sync Upstream
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    # 每天北京时间 11:17 自动同步
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Sync with upstream
+      - name: Checkout fork
         uses: actions/checkout@v4
         with:
-          repository: OpenListTeam/OpenList-Worker
-          ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push changes to fork
+      - name: Add upstream repository
         run: |
-          git remote add fork https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git push fork HEAD:main
+          git remote add upstream https://github.com/OpenListTeam/OpenList-Worker.git
+          git fetch upstream
+
+      - name: Sync main branch
+        run: |
+          git checkout main
+          git merge --ff-only upstream/main
+          git push origin main
